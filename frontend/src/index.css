@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #0A0A0A;
+  color: #FAFAFA;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #262626;
+  }
+  50% {
+    border-color: #DC2626;
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 1.5s ease-in-out infinite;
+}

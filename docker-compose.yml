@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  red:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
+      - GOOGLE_GENAI_USE_VERTEXAI=true
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_APP_KEY=${DD_APP_KEY}
+      - DD_SITE=${DD_SITE:-datadoghq.com}
+      - DD_SERVICE=red-llm-security
+      - DD_ENV=production
+      - DD_LLMOBS_ENABLED=1
+      - DD_LLMOBS_ML_APP=red-security-testing
+      - DD_LLMOBS_AGENTLESS_ENABLED=1
+    volumes:
+      - ./datadog:/app/datadog
+      - ${GOOGLE_APPLICATION_CREDENTIALS:-~/.config/gcloud/application_default_credentials.json}:/app/credentials.json:ro
+    restart: unless-stopped

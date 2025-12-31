@@ -1,0 +1,45 @@
+[
+  {
+    "name": "[RED] Jailbreak Success Detected",
+    "type": "metric alert",
+    "query": "sum(last_5m):sum:red.security.attack.success{severity:high OR severity:critical} > 3",
+    "message": "\n🔴 **RED Alert: Successful Jailbreak Attacks Detected**\n\nMultiple high/critical severity jailbreak attacks have succeeded against your LLM application.\n\n**What this means:**\n- Attackers can bypass your AI's safety guardrails\n- Your system prompt may be exposed\n- Confidential data could be at risk\n\n**Immediate Actions:**\n1. Review LLM Observability traces\n2. Check for leaked information\n3. Consider implementing stricter input validation\n\n@slack-security-alerts\n",
+    "tags": ["service:red-llm-security", "category:jailbreak", "team:security"],
+    "options": {
+      "thresholds": {"critical": 3, "warning": 1},
+      "notify_no_data": false,
+      "renotify_interval": 60
+    }
+  },
+  {
+    "name": "[RED] System Prompt Leaked",
+    "type": "log alert",
+    "query": "logs(\"service:red-llm-security leak_type:system_prompt\").index(\"*\").rollup(\"count\").by(\"attack_id\").last(\"15m\") > 0",
+    "message": "\n🔴 **RED Alert: System Prompt Leakage Detected**\n\nYour LLM's system prompt has been extracted through an attack.\n\n**Severity: HIGH**\n\n**Exposed Information:**\n- System instructions\n- Behavioral guidelines\n- Potentially confidential business logic\n\n**Immediate Actions:**\n1. Rotate sensitive configuration if exposed\n2. Review the attack trace in LLM Observability\n3. Implement system prompt protection\n\n@pagerduty-security\n",
+    "tags": ["service:red-llm-security", "category:leak", "leak_type:system_prompt"]
+  },
+  {
+    "name": "[RED] PII Exfiltration Alert",
+    "type": "metric alert",
+    "query": "sum(last_10m):sum:red.security.leak.detected{leak_type:pii} > 0",
+    "message": "\n🔴 **CRITICAL: PII Data Exfiltration Detected**\n\nPersonal Identifiable Information (PII) has been leaked through your LLM application.\n\n**This is a potential data breach.**\n\n**Immediate Actions:**\n1. Identify affected data subjects\n2. Review compliance implications (GDPR, CCPA)\n3. Initiate incident response procedures\n\n@incident-response @legal-team\n",
+    "tags": ["service:red-llm-security", "category:pii", "compliance:critical"],
+    "options": {"thresholds": {"critical": 0}}
+  },
+  {
+    "name": "[RED] Credential Exposure Detected",
+    "type": "metric alert",
+    "query": "sum(last_5m):sum:red.security.leak.detected{leak_type:credentials} > 0",
+    "message": "\n🔴 **CRITICAL: Credentials Exposed**\n\nAPI keys, passwords, or other credentials have been leaked.\n\n**Immediate Actions:**\n1. ROTATE ALL EXPOSED CREDENTIALS IMMEDIATELY\n2. Review access logs for unauthorized use\n3. Check for lateral movement\n\n@security-ops @incident-commander\n",
+    "tags": ["service:red-llm-security", "category:credentials", "severity:critical"],
+    "options": {"thresholds": {"critical": 0}}
+  },
+  {
+    "name": "[RED] Attack Success Rate Anomaly",
+    "type": "metric alert",
+    "query": "avg(last_15m):avg:red.security.assessment.success_rate{*} > 30",
+    "message": "\n⚠️ **Warning: High Attack Success Rate**\n\nYour LLM application is showing a high vulnerability to attacks.\n\n**Success Rate:** {{value}}%\n\nThis indicates systemic security weaknesses that need attention.\n\n**Recommended Actions:**\n1. Review recent security assessment report\n2. Prioritize fixing high/critical vulnerabilities\n3. Consider additional security hardening\n\n@security-team\n",
+    "tags": ["service:red-llm-security", "category:anomaly"],
+    "options": {"thresholds": {"critical": 50, "warning": 30}}
+  }
+]

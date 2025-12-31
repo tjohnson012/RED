@@ -1,0 +1,30 @@
+[
+  {
+    "name": "LLM Security - Low Attack Success Rate",
+    "type": "metric",
+    "description": "Maintain low attack success rate against LLM application",
+    "tags": ["service:red-llm-security", "team:security"],
+    "thresholds": [
+      {"timeframe": "7d", "target": 80.0, "warning": 90.0},
+      {"timeframe": "30d", "target": 85.0, "warning": 90.0}
+    ],
+    "query": {
+      "numerator": "sum:red.security.attack.failure{*}.as_count()",
+      "denominator": "sum:red.security.attack.count{*}.as_count()"
+    }
+  },
+  {
+    "name": "LLM Security - No Critical Leaks",
+    "type": "metric",
+    "description": "Zero critical data leaks (credentials, PII)",
+    "tags": ["service:red-llm-security", "compliance:critical"],
+    "thresholds": [
+      {"timeframe": "7d", "target": 100.0},
+      {"timeframe": "30d", "target": 100.0}
+    ],
+    "query": {
+      "numerator": "sum:red.security.attack.count{severity:NOT IN (critical)}.as_count()",
+      "denominator": "sum:red.security.attack.count{*}.as_count()"
+    }
+  }
+]
