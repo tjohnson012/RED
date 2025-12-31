@@ -26,11 +26,17 @@ LLMObs.enable(
 )
 
 # NOW import FastAPI and app code
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 
 from .api.routes import router
+
+# Static files path
+STATIC_DIR = Path(__file__).parent.parent / "static"
 
 
 @asynccontextmanager
@@ -78,17 +84,33 @@ app.add_middleware(
 # Include routes
 app.include_router(router, prefix="/api/v1")
 
+# Serve static files if they exist (production)
+if STATIC_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
 
-@app.get("/")
-async def root():
-    """Root endpoint with project info."""
-    return {
-        "name": "RED",
-        "tagline": "We break your AI before attackers do.",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/api/v1/health"
-    }
+    @app.get("/")
+    async def serve_spa():
+        """Serve the React SPA."""
+        return FileResponse(STATIC_DIR / "index.html")
+
+    @app.get("/{full_path:path}")
+    async def catch_all(full_path: str):
+        """Catch-all route for SPA routing."""
+        file_path = STATIC_DIR / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(STATIC_DIR / "index.html")
+else:
+    @app.get("/")
+    async def root():
+        """Root endpoint with project info."""
+        return {
+            "name": "RED",
+            "tagline": "We break your AI before attackers do.",
+            "version": "1.0.0",
+            "docs": "/docs",
+            "health": "/api/v1/health"
+        }
 
 
 if __name__ == "__main__":
