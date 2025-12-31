@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: red-security-testing
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GOOGLE_CLOUD_PROJECT
+        sync: false
+      - key: GOOGLE_CLOUD_LOCATION
+        value: us-central1
+      - key: GOOGLE_GENAI_USE_VERTEXAI
+        value: "true"
+      - key: DD_API_KEY
+        sync: false
+      - key: DD_APP_KEY
+        sync: false
+      - key: DD_SITE
+        value: us5.datadoghq.com
+      - key: DD_SERVICE
+        value: red-llm-security
+      - key: DD_ENV
+        value: production
+      - key: DD_LLMOBS_ENABLED
+        value: "1"
+      - key: DD_LLMOBS_ML_APP
+        value: red-security-testing
+      - key: DD_LLMOBS_AGENTLESS_ENABLED
+        value: "1"
